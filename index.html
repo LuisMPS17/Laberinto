@@ -38,7 +38,12 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Pantalla principal */
+        h2 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
         #mainMenu {
             text-align: center;
         }
@@ -74,7 +79,10 @@
             transform: none;
         }
 
-        /* Área de juego */
+        .menu-buttons button.active {
+            background: #2ecc71 !important;
+        }
+
         #gameArea {
             display: none;
         }
@@ -104,7 +112,6 @@
             color: #667eea;
         }
 
-        /* Barra de progreso */
         .progress-container {
             width: 100%;
             background: #e0e0e0;
@@ -248,13 +255,116 @@
             text-align: center;
             border: 2px solid #ffc107;
         }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #e0e0e0;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .tab-btn.active {
+            background: #667eea !important;
+            color: white !important;
+        }
+
+        .record-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .record-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        .record-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.9em;
+        }
+
+        .record-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .record-table tr:hover {
+            background: #e8f4f8;
+        }
+
+        .record-rank {
+            font-weight: bold;
+            color: #667eea;
+            width: 50px;
+            text-align: center;
+        }
+
+        .record-name {
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #333;
+        }
+
+        .record-time {
+            color: #16c79a;
+            font-weight: bold;
+        }
+
+        .record-date {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .no-records {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+
+        #playerNameInput:focus {
+            outline: none;
+            border-color: #16c79a;
+            box-shadow: 0 0 10px rgba(22, 199, 154, 0.3);
+        }
+
+        /* damage flash overlay */
+        .damage-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: rgba(231,76,60,0); /* starts transparent */
+            transition: background 180ms ease-out;
+            z-index: 2000;
+        }
+        .damage-overlay.active {
+            background: rgba(231,76,60,0.55);
+            transition: background 180ms ease-in;
+        }
+        /* pequeña vibración/flash opcional */
+        @keyframes damagePulse {
+            0% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+            60% { transform: translateY(2px); }
+            100% { transform: translateY(0); }
+        }
+        .damage-overlay.active .pulse {
+            animation: damagePulse 260ms linear;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🧠 NeuroRaze</h1>
         
-        <!-- Menú Principal -->
         <div id="mainMenu">
             <div class="menu-buttons">
                 <button id="startGameBtn">🎮 Iniciar Juego</button>
@@ -263,7 +373,38 @@
             </div>
         </div>
 
-        <!-- Área de Juego -->
+        <div id="recordsScreen" style="display:none;">
+            <h2>🏆 HALL OF FAME 🏆</h2>
+            <div id="recordsTabs" style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
+                <button class="tab-btn active" data-level="0">Nivel 1</button>
+                <button class="tab-btn" data-level="1">Nivel 2</button>
+                <button class="tab-btn" data-level="2">Nivel 3</button>
+            </div>
+            <div id="recordsContent" style="background:#f8f9fa; padding:20px; border-radius:10px; min-height:300px;"></div>
+            <div style="text-align:center; margin-top:20px;">
+                <button id="backFromRecordsBtn">Volver al Menú</button>
+            </div>
+        </div>
+
+        <div id="nameInputScreen" style="display:none;">
+            <h2 style="color:#16c79a;">🎉 ¡NUEVO RECORD! 🎉</h2>
+            <div style="text-align:center; font-size:1.3em; margin-bottom:30px; color:#333;">
+                <div>Tiempo: <strong id="recordTime" style="color:#667eea;">0s</strong></div>
+                <div style="margin-top:10px;">Nivel: <strong id="recordLevel" style="color:#764ba2;">-</strong></div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:1.2em; margin-bottom:15px; color:#555;">Ingresa tu nombre:</div>
+                <input type="text" id="playerNameInput" maxlength="10" 
+                       style="font-size:2em; text-align:center; padding:15px; width:300px; max-width:90%; 
+                              border:3px solid #667eea; border-radius:10px; text-transform:uppercase; 
+                              letter-spacing:5px; font-weight:bold; background:#fff3cd;"
+                       placeholder="PLAYER">
+                <div style="margin-top:20px;">
+                    <button id="saveRecordBtn" style="font-size:1.2em; padding:15px 40px;">💾 GUARDAR</button>
+                </div>
+            </div>
+        </div>
+
         <div id="gameArea">
             <div class="info">
                 <div class="info-item" id="memoryTimeContainer" style="display:none;">
@@ -302,17 +443,22 @@
         </div>
     </div>
 
+    <!-- overlay para efecto de daño -->
+    <div id="damageOverlay" class="damage-overlay"><div class="pulse" style="width:100%;height:100%"></div></div>
+    
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        
-        // Elementos del DOM
+
         const mainMenu = document.getElementById('mainMenu');
         const gameArea = document.getElementById('gameArea');
+        const recordsScreen = document.getElementById('recordsScreen');
+        const nameInputScreen = document.getElementById('nameInputScreen');
         const startGameBtn = document.getElementById('startGameBtn');
         const recordsBtn = document.getElementById('recordsBtn');
         const exitBtn = document.getElementById('exitBtn');
         const backToMenuBtn = document.getElementById('backToMenuBtn');
+        const backFromRecordsBtn = document.getElementById('backFromRecordsBtn');
         const restartBtn = document.getElementById('restartBtn');
         const helpBtn = document.getElementById('helpBtn');
         const helpWarning = document.getElementById('helpWarning');
@@ -322,45 +468,133 @@
         const gameTimeContainer = document.getElementById('gameTimeContainer');
         const progressBar = document.getElementById('progressBar');
         const progressTime = document.getElementById('progressTime');
+        const playerNameInput = document.getElementById('playerNameInput');
+        const saveRecordBtn = document.getElementById('saveRecordBtn');
+        const recordTime = document.getElementById('recordTime');
+        const recordLevel = document.getElementById('recordLevel');
+        const recordsContent = document.getElementById('recordsContent');
+        const recordsTabs = document.getElementById('recordsTabs');
 
-        // Configuración del juego
-        const CELL_SIZE = 50;
-        const COLS = 10;
-        const ROWS = 10;
-        const MEMORY_TIME = 10; // segundos para memorizar
-        const GAME_TIME = 60; // segundos para completar
-
-        // Estados del juego
-        let gameState = 'ready'; // ready, memorizing, playing, won, lost
-        let showMaze = true;
-        let memoryTimer = MEMORY_TIME;
-        let gameTimer = GAME_TIME;
-        let timerInterval;
-        let helpActive = false;
-        let normalTimerSpeed = 1000; // 1 segundo normal
-        let helpTimerSpeed = 200; // 5x más rápido (1000/5 = 200ms)
-
-        // Laberinto (1 = pared, 0 = camino)
-        const maze = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-            [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
-            [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-            [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-            [1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        const levels = [
+            {
+                name: 'Nivel 1',
+                grid: [
+                    [1,1,1,1,1,1,1,1],
+                    [1,0,0,0,1,0,0,1],
+                    [1,0,1,0,1,0,1,1],
+                    [1,0,1,0,0,0,0,1],
+                    [1,0,1,1,1,1,0,1],
+                    [1,0,0,0,0,0,0,1],
+                    [1,0,1,1,1,1,0,1],
+                    [1,1,1,1,1,1,1,1]
+                ],
+                start: {x:1,y:1},
+                goal: {x:6,y:5},
+                memoryTime: 7,
+                gameTime: 45
+            },
+            {
+                name: 'Nivel 2',
+                grid: [
+                    [1,1,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,1,0,0,0,0,1],
+                    [1,0,1,0,1,0,1,1,0,1],
+                    [1,0,1,0,0,0,0,1,0,1],
+                    [1,0,1,1,1,1,0,1,0,1],
+                    [1,0,0,0,0,0,0,1,0,1],
+                    [1,1,1,0,1,1,1,1,0,1],
+                    [1,0,0,0,0,0,0,0,0,1],
+                    [1,0,1,1,1,1,1,1,0,1],
+                    [1,1,1,1,1,1,1,1,1,1]
+                ],
+                start: {x:1,y:1},
+                goal: {x:8,y:8},
+                memoryTime: 10,
+                gameTime: 60
+            },
+            {
+                name: 'Nivel 3',
+                grid: [
+                    [1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,0,0,0,1,0,0,0,0,0,0,1],
+                    [1,0,1,0,1,0,1,1,1,1,0,1],
+                    [1,0,1,0,0,0,0,0,0,1,0,1],
+                    [1,0,1,1,1,1,1,1,0,1,0,1],
+                    [1,0,0,0,0,0,0,1,0,1,0,1],
+                    [1,1,1,1,1,1,0,1,0,1,0,1],
+                    [1,0,0,0,0,0,0,1,0,0,0,1],
+                    [1,0,1,1,1,1,0,1,1,1,0,1],
+                    [1,0,0,0,0,1,0,0,0,1,0,1],
+                    [1,0,1,1,0,0,0,1,0,0,0,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1]
+                ],
+                start: {x:1,y:1},
+                goal: {x:10,y:9},
+                memoryTime: 12,
+                gameTime: 80
+            }
         ];
 
-        // Posición del jugador
-        let player = { x: 1, y: 1 };
+        let currentLevelIndex = 0;
+        let maze = levels[currentLevelIndex].grid;
+        let ROWS = maze.length;
+        let COLS = maze[0].length;
+        let CELL_SIZE = Math.floor(canvas.width / COLS);
+        let player = { ...levels[currentLevelIndex].start };
+        let goal = { ...levels[currentLevelIndex].goal };
+        let gameState = 'ready';
+        let showMaze = true;
+        let memoryTimer = levels[currentLevelIndex].memoryTime;
+        let gameTimer = levels[currentLevelIndex].gameTime;
+        let gameMaxTime = levels[currentLevelIndex].gameTime;
+        let timerInterval = null;
+        let helpActive = false;
+        const normalTimerSpeed = 1000;
 
-        // Posición de la meta
-        const goal = { x: 8, y: 8 };
+        function getHelpMultiplier() { return 5 + currentLevelIndex; }
+        function getHelpTimerSpeedMs() { 
+            const mult = getHelpMultiplier();
+            return Math.max(50, Math.round(normalTimerSpeed / mult));
+        }
 
-        // Dibujar el laberinto
+        (function createLevelSelector() {
+            const selector = document.createElement('div');
+            selector.style.marginTop = '20px';
+            selector.style.display = 'flex';
+            selector.style.justifyContent = 'center';
+            selector.style.gap = '8px';
+            levels.forEach((lvl, idx) => {
+                const b = document.createElement('button');
+                b.textContent = lvl.name;
+                b.style.padding = '10px 14px';
+                b.style.fontSize = '0.9em';
+                b.addEventListener('click', () => {
+                    setLevel(idx);
+                    Array.from(selector.children).forEach(ch => ch.classList.remove('active'));
+                    b.classList.add('active');
+                });
+                if (idx === currentLevelIndex) b.classList.add('active');
+                selector.appendChild(b);
+            });
+            mainMenu.querySelector('.menu-buttons').appendChild(selector);
+        })();
+
+        function setLevel(index) {
+            currentLevelIndex = index;
+            maze = levels[index].grid;
+            ROWS = maze.length;
+            COLS = maze[0].length;
+            CELL_SIZE = Math.floor(canvas.width / COLS);
+            player = {...levels[index].start};
+            goal = {...levels[index].goal};
+            memoryTimer = levels[index].memoryTime;
+            gameTimer = levels[index].gameTime;
+            gameMaxTime = levels[index].gameTime;
+            memoryTimeDisplay.textContent = memoryTimer;
+            updateProgressBar();
+            render();
+        }
+
         function drawMaze() {
             for (let row = 0; row < ROWS; row++) {
                 for (let col = 0; col < COLS; col++) {
@@ -382,42 +616,25 @@
             }
         }
 
-        // Dibujar la meta
         function drawGoal() {
             if (showMaze) {
                 ctx.fillStyle = '#16c79a';
                 ctx.beginPath();
-                ctx.arc(
-                    goal.x * CELL_SIZE + CELL_SIZE / 2,
-                    goal.y * CELL_SIZE + CELL_SIZE / 2,
-                    CELL_SIZE / 3,
-                    0,
-                    Math.PI * 2
-                );
+                ctx.arc(goal.x * CELL_SIZE + CELL_SIZE / 2, goal.y * CELL_SIZE + CELL_SIZE / 2, CELL_SIZE / 3, 0, Math.PI * 2);
                 ctx.fill();
             }
         }
 
-        // Dibujar el jugador
         function drawPlayer() {
             ctx.fillStyle = '#f39c12';
             ctx.beginPath();
-            ctx.arc(
-                player.x * CELL_SIZE + CELL_SIZE / 2,
-                player.y * CELL_SIZE + CELL_SIZE / 2,
-                CELL_SIZE / 3,
-                0,
-                Math.PI * 2
-            );
+            ctx.arc(player.x * CELL_SIZE + CELL_SIZE / 2, player.y * CELL_SIZE + CELL_SIZE / 2, CELL_SIZE / 3, 0, Math.PI * 2);
             ctx.fill();
-            
-            // Borde
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 2;
             ctx.stroke();
         }
 
-        // Renderizar todo
         function render() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawMaze();
@@ -425,51 +642,29 @@
             drawPlayer();
         }
 
-        // Mover jugador
         function movePlayer(dx, dy) {
             if (gameState !== 'playing') return;
-
             const newX = player.x + dx;
             const newY = player.y + dy;
-
-            // Verificar límites y colisiones
             if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
                 if (maze[newY][newX] === 0) {
                     player.x = newX;
                     player.y = newY;
-
-                    // Verificar si llegó a la meta
                     if (player.x === goal.x && player.y === goal.y) {
                         winGame();
                     }
-
                     render();
                 } else {
-                    // Se movió hacia una pared (movimiento incorrecto)
-                    // Penalización: -10 segundos
                     gameTimer = Math.max(0, gameTimer - 10);
                     updateProgressBar();
-                    
-                    // Mostrar mensaje de penalización temporal
                     const tempMsg = document.createElement('div');
                     tempMsg.textContent = '❌ -10 segundos por movimiento incorrecto!';
-                    tempMsg.style.cssText = `
-                        position: fixed;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        background: rgba(231, 76, 60, 0.95);
-                        color: white;
-                        padding: 20px 40px;
-                        border-radius: 10px;
-                        font-size: 1.2em;
-                        font-weight: bold;
-                        z-index: 1000;
-                        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-                    `;
+                    tempMsg.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(231,76,60,0.95);color:white;padding:20px 40px;border-radius:10px;font-size:1.2em;font-weight:bold;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.3);`;
                     document.body.appendChild(tempMsg);
+                    // efecto visual y sonido de impacto
+                    damageFlash();
+                    playHitSound();
                     setTimeout(() => tempMsg.remove(), 1500);
-                    
                     if (gameTimer <= 0) {
                         clearInterval(timerInterval);
                         loseGame();
@@ -477,51 +672,76 @@
                 }
             }
         }
+       
+        // --- daño: overlay flash + sonido con WebAudio ---
+        const damageOverlay = document.getElementById('damageOverlay');
+        let audioCtx = null;
+        function playHitSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const ctx = audioCtx;
+                const now = ctx.currentTime;
+                // capa grave (golpe thud)
+                const osc1 = ctx.createOscillator();
+                const g1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(120, now);
+                g1.gain.setValueAtTime(0.0001, now);
+                g1.gain.exponentialRampToValueAtTime(0.8, now + 0.005);
+                g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+                osc1.connect(g1).connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.3);
+                // capa aguda (clic rápido)
+                const osc2 = ctx.createOscillator();
+                const g2 = ctx.createGain();
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(1200, now);
+                g2.gain.setValueAtTime(0.0001, now);
+                g2.gain.exponentialRampToValueAtTime(0.25, now + 0.002);
+                g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+                osc2.connect(g2).connect(ctx.destination);
+                osc2.start(now);
+                osc2.stop(now + 0.12);
+            } catch (e) {
+                // silent fail si AudioContext bloqueado
+                console.warn('No se pudo reproducir sonido de impacto:', e);
+            }
+        }
 
-        // Control de teclado
+        function damageFlash() {
+            if (!damageOverlay) return;
+            damageOverlay.classList.add('active');
+            // quitar después breve tiempo
+            setTimeout(() => {
+                damageOverlay.classList.remove('active');
+            }, 260);
+        }
+        // reemplazado: evitar interferir con inputs (ej. playerNameInput)
         document.addEventListener('keydown', (e) => {
+            const active = document.activeElement;
+            if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+                // dejar que el input reciba la tecla (permite escribir "a", "w", "s", "d")
+                return;
+            }
             switch(e.key) {
-                case 'ArrowUp':
-                case 'w':
-                case 'W':
-                    e.preventDefault();
-                    movePlayer(0, -1);
-                    break;
-                case 'ArrowDown':
-                case 's':
-                case 'S':
-                    e.preventDefault();
-                    movePlayer(0, 1);
-                    break;
-                case 'ArrowLeft':
-                case 'a':
-                case 'A':
-                    e.preventDefault();
-                    movePlayer(-1, 0);
-                    break;
-                case 'ArrowRight':
-                case 'd':
-                case 'D':
-                    e.preventDefault();
-                    movePlayer(1, 0);
-                    break;
+                case 'ArrowUp': case 'w': case 'W': e.preventDefault(); movePlayer(0, -1); break;
+                case 'ArrowDown': case 's': case 'S': e.preventDefault(); movePlayer(0, 1); break;
+                case 'ArrowLeft': case 'a': case 'A': e.preventDefault(); movePlayer(-1, 0); break;
+                case 'ArrowRight': case 'd': case 'D': e.preventDefault(); movePlayer(1, 0); break;
             }
         });
 
-        // Mostrar mensaje
         function showMessage(text, type) {
             messageDiv.textContent = text;
             messageDiv.className = `message ${type}`;
             messageDiv.style.display = 'block';
         }
 
-        // Actualizar barra de progreso
         function updateProgressBar() {
-            const percentage = (gameTimer / GAME_TIME) * 100;
+            const percentage = (gameTimer / gameMaxTime) * 100;
             progressBar.style.width = percentage + '%';
             progressTime.textContent = gameTimer + 's';
-            
-            // Cambiar color según tiempo restante
             if (percentage > 50) {
                 progressBar.style.background = 'linear-gradient(90deg, #16c79a 0%, #11998e 100%)';
             } else if (percentage > 25) {
@@ -531,38 +751,39 @@
             }
         }
 
-        // Iniciar juego desde menú
         function startGameFromMenu() {
             mainMenu.style.display = 'none';
             gameArea.style.display = 'block';
             startGame();
         }
 
-        // Iniciar juego
         function startGame() {
+            const lvl = levels[currentLevelIndex];
+            maze = lvl.grid;
+            ROWS = maze.length;
+            COLS = maze[0].length;
+            CELL_SIZE = Math.floor(canvas.width / COLS);
+            player = {...lvl.start};
+            goal = {...lvl.goal};
+            memoryTimer = lvl.memoryTime;
+            gameTimer = lvl.gameTime;
+            gameMaxTime = lvl.gameTime;
             gameState = 'memorizing';
             showMaze = true;
-            memoryTimer = MEMORY_TIME;
-            gameTimer = GAME_TIME;
-            player = { x: 1, y: 1 };
             helpActive = false;
-            
             restartBtn.style.display = 'none';
             helpBtn.style.display = 'none';
             helpWarning.style.display = 'none';
             messageDiv.style.display = 'none';
             memoryTimeContainer.style.display = 'block';
             gameTimeContainer.style.display = 'none';
-            
             render();
             showMessage(`¡Memoriza el laberinto! ${memoryTimer}s`, 'memorize');
-            
-            // Timer de memorización
+            if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 memoryTimer--;
                 memoryTimeDisplay.textContent = memoryTimer;
                 showMessage(`¡Memoriza el laberinto! ${memoryTimer}s`, 'memorize');
-                
                 if (memoryTimer <= 0) {
                     clearInterval(timerInterval);
                     startPlayPhase();
@@ -570,7 +791,6 @@
             }, 1000);
         }
 
-        // Fase de juego
         function startPlayPhase() {
             gameState = 'playing';
             showMaze = false;
@@ -580,19 +800,15 @@
             render();
             updateProgressBar();
             showMessage('¡Encuentra la salida!', 'play');
-            
-            // Timer de juego
             startGameTimer();
         }
 
-        // Iniciar el timer del juego
         function startGameTimer() {
-            const currentSpeed = helpActive ? helpTimerSpeed : normalTimerSpeed;
-            
+            if (timerInterval) clearInterval(timerInterval);
+            const currentSpeed = helpActive ? getHelpTimerSpeedMs() : normalTimerSpeed;
             timerInterval = setInterval(() => {
                 gameTimer--;
                 updateProgressBar();
-                
                 if (gameTimer <= 0) {
                     clearInterval(timerInterval);
                     loseGame();
@@ -600,30 +816,25 @@
             }, currentSpeed);
         }
 
-        // Reiniciar el timer con nueva velocidad
         function restartGameTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
+            if (timerInterval) clearInterval(timerInterval);
             startGameTimer();
         }
 
-        // Activar ayuda
         function activateHelp() {
             if (gameState !== 'playing') return;
-            
             helpActive = true;
             showMaze = true;
             helpBtn.classList.add('active');
+            const mult = getHelpMultiplier();
+            helpWarning.textContent = `⚠️ ¡El tiempo corre ${mult}x más rápido mientras usas la ayuda!`;
             helpWarning.style.display = 'block';
             render();
             restartGameTimer();
         }
 
-        // Desactivar ayuda
         function deactivateHelp() {
             if (gameState !== 'playing') return;
-            
             helpActive = false;
             showMaze = false;
             helpBtn.classList.remove('active');
@@ -632,17 +843,150 @@
             restartGameTimer();
         }
 
-        // Ganar
         function winGame() {
             gameState = 'won';
             clearInterval(timerInterval);
             showMaze = true;
             render();
-            showMessage('🎉 ¡Felicidades! ¡Has completado el laberinto!', 'win');
-            restartBtn.style.display = 'inline-block';
+            checkAndSaveRecord();
         }
 
-        // Perder
+        // --- added: storage wrapper with fallback a localStorage ---
+        const storage = {
+            async get(key) {
+                if (window.storage && typeof window.storage.get === 'function') {
+                    return window.storage.get(key);
+                }
+                const value = localStorage.getItem(key);
+                return { value };
+            },
+            async set(key, value) {
+                if (window.storage && typeof window.storage.set === 'function') {
+                    return window.storage.set(key, value);
+                }
+                localStorage.setItem(key, value);
+                return;
+            }
+        };
+
+        async function checkAndSaveRecord() {
+            const finalTime = gameTimer;
+            const levelIndex = currentLevelIndex;
+            try {
+                const key = `records:level${levelIndex}`;
+                let records = [];
+                try {
+                    const result = await storage.get(key);
+                    if (result && result.value) {
+                        records = JSON.parse(result.value);
+                    }
+                } catch (error) {
+                    console.log('No hay records previos');
+                }
+                const isNewRecord = records.length < 10 || finalTime > records[records.length - 1].time;
+                if (isNewRecord) {
+                    showNameInput(finalTime, levelIndex);
+                } else {
+                    showMessage('🎉 ¡Felicidades! ¡Has completado el laberinto!', 'win');
+                    restartBtn.style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.error('Error al verificar records:', error);
+                showMessage('🎉 ¡Felicidades! ¡Has completado el laberinto!', 'win');
+                restartBtn.style.display = 'inline-block';
+            }
+        }
+
+        function showNameInput(time, levelIndex) {
+            gameArea.style.display = 'none';
+            nameInputScreen.style.display = 'block';
+            recordTime.textContent = time + 's';
+            recordLevel.textContent = levels[levelIndex].name;
+            playerNameInput.value = '';
+            playerNameInput.focus();
+            nameInputScreen.dataset.time = time;
+            nameInputScreen.dataset.level = levelIndex;
+        }
+
+        async function saveRecord() {
+            const name = playerNameInput.value.trim().toUpperCase() || 'PLAYER';
+            const time = parseInt(nameInputScreen.dataset.time);
+            const levelIndex = parseInt(nameInputScreen.dataset.level);
+            try {
+                const key = `records:level${levelIndex}`;
+                let records = [];
+                try {
+                    const result = await storage.get(key);
+                    if (result && result.value) {
+                        records = JSON.parse(result.value);
+                    }
+                } catch (error) {}
+                records.push({
+                    name: name,
+                    time: time,
+                    date: new Date().toISOString()
+                });
+                records.sort((a, b) => b.time - a.time);
+                records = records.slice(0, 10);
+                await storage.set(key, JSON.stringify(records));
+                nameInputScreen.style.display = 'none';
+                mainMenu.style.display = 'block';
+                const successMsg = document.createElement('div');
+                successMsg.textContent = '✨ ¡Record guardado exitosamente! ✨';
+                successMsg.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(22,199,154,0.95);color:white;padding:30px 50px;border-radius:15px;font-size:1.5em;font-weight:bold;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,0.3);`;
+                document.body.appendChild(successMsg);
+                setTimeout(() => successMsg.remove(), 2000);
+            } catch (error) {
+                console.error('Error al guardar record:', error);
+                alert('Error al guardar el record. Por favor intenta de nuevo.');
+            }
+        }
+
+        async function showRecordsScreen(levelIndex = 0) {
+            mainMenu.style.display = 'none';
+            recordsScreen.style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === levelIndex);
+            });
+            await loadRecords(levelIndex);
+        }
+
+        async function loadRecords(levelIndex) {
+            try {
+                const key = `records:level${levelIndex}`;
+                let records = [];
+                try {
+                    const result = await storage.get(key);
+                    if (result && result.value) {
+                        records = JSON.parse(result.value);
+                    }
+                } catch (error) {}
+                if (records.length === 0) {
+                    recordsContent.innerHTML = '<div class="no-records">No hay records todavía.<br>¡Sé el primero en completar este nivel!</div>';
+                } else {
+                    let html = '<table class="record-table">';
+                    html += '<thead><tr><th class="record-rank">Pos</th><th>Jugador</th><th>Tiempo</th><th>Fecha</th></tr></thead>';
+                    html += '<tbody>';
+                    records.forEach((record, index) => {
+                        const date = new Date(record.date);
+                        const dateStr = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' });
+                        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                        html += `<tr>
+                            <td class="record-rank">${medal} ${index + 1}</td>
+                            <td class="record-name">${record.name}</td>
+                            <td class="record-time">${record.time}s</td>
+                            <td class="record-date">${dateStr}</td>
+                        </tr>`;
+                    });
+                    html += '</tbody></table>';
+                    recordsContent.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error al cargar records:', error);
+                recordsContent.innerHTML = '<div class="no-records">Error al cargar los records.</div>';
+            }
+        }
+
         function loseGame() {
             gameState = 'lost';
             showMaze = true;
@@ -651,46 +995,48 @@
             restartBtn.style.display = 'inline-block';
         }
 
-        // Volver al menú
         function backToMenu() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
+            if (timerInterval) clearInterval(timerInterval);
             gameState = 'ready';
             showMaze = true;
-            memoryTimer = MEMORY_TIME;
-            gameTimer = GAME_TIME;
-            player = { x: 1, y: 1 };
-            
+            const lvl = levels[currentLevelIndex];
+            memoryTimer = lvl.memoryTime;
+            gameTimer = lvl.gameTime;
+            player = {...lvl.start};
             gameArea.style.display = 'none';
+            recordsScreen.style.display = 'none';
+            nameInputScreen.style.display = 'none';
             mainMenu.style.display = 'block';
             messageDiv.style.display = 'none';
         }
 
-        // Event listeners
         startGameBtn.addEventListener('click', startGameFromMenu);
         backToMenuBtn.addEventListener('click', backToMenu);
+        backFromRecordsBtn.addEventListener('click', backToMenu);
         restartBtn.addEventListener('click', startGame);
-        exitBtn.addEventListener('click', () => {
-            window.close();
+        exitBtn.addEventListener('click', () => { window.close(); });
+        recordsBtn.addEventListener('click', () => showRecordsScreen(0));
+        saveRecordBtn.addEventListener('click', saveRecord);
+        playerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveRecord();
+            }
         });
-
-        // Event listeners para el botón de ayuda
+        recordsTabs.addEventListener('click', (e) => {
+            if (e.target.classList.contains('tab-btn')) {
+                const levelIndex = parseInt(e.target.dataset.level);
+                loadRecords(levelIndex);
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+            }
+        });
         helpBtn.addEventListener('mousedown', activateHelp);
         helpBtn.addEventListener('mouseup', deactivateHelp);
         helpBtn.addEventListener('mouseleave', deactivateHelp);
-        
-        // Para dispositivos táctiles
-        helpBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            activateHelp();
-        });
-        helpBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            deactivateHelp();
-        });
+        helpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); activateHelp(); });
+        helpBtn.addEventListener('touchend', (e) => { e.preventDefault(); deactivateHelp(); });
 
-        // Render inicial (aunque no se muestra hasta iniciar)
+        setLevel(currentLevelIndex);
         render();
     </script>
 </body>
