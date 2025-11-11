@@ -13,7 +13,14 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Fallback color (se usa si la imagen no carga) */
+            background-color: #667eea;
+            
+            background-image: url('fondo1.png');
+            background-size: cover; /* cubre todo el viewport */
+            background-position: center center; /* centra la imagen */
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,12 +29,19 @@
         }
 
         .container {
-            background: white;
+            /* Fallback color si la imagen no carga */
+            background-color: rgb(19, 59, 66);
+            /* Imagen de fondo para el contenedor - coloca fondo2.png en la misma carpeta o cambia la ruta */
+            background-image: url('fondo2.png');
+            background-size: cover; /* cubrir el área del contenedor */
+            background-position: center center;
+            background-repeat: no-repeat;
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             max-width: 600px;
             width: 100%;
+            overflow: hidden;
         }
 
         h1 {
@@ -36,6 +50,14 @@
             margin-bottom: 20px;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            max-width: 500px; 
+            width: 100%;
+            height: auto;
         }
 
         h2 {
@@ -363,7 +385,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧠 NeuroRaze</h1>
+        
+        <img src="NEURO RAZE.png" alt="NeuroRaze" class="logo">
         
         <div id="mainMenu">
             <div class="menu-buttons">
