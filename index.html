@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroRaze</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Pantalla principal */
+        #mainMenu {
+            text-align: center;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .menu-buttons button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .menu-buttons button:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .menu-buttons button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Área de juego */
+        #gameArea {
+            display: none;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Barra de progreso */
+        .progress-container {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 30px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #16c79a 0%, #11998e 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+        }
+
+        .progress-time {
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        #gameCanvas {
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            display: block;
+            margin: 20px auto;
+            background: #1a1a2e;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .message.memorize {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .message.play {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .message.win {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message.lose {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .instructions {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .instructions strong {
+            color: #667eea;
+        }
+
+        #helpBtn {
+            background: #e67e22;
+            font-size: 1.1em;
+            padding: 15px 40px;
+        }
+
+        #helpBtn:hover {
+            background: #d35400;
+        }
+
+        #helpBtn:active {
+            background: #c0392b;
+            transform: scale(0.98);
+        }
+
+        #helpBtn.active {
+            background: #c0392b;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            text-align: center;
+            border: 2px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 NeuroRaze</h1>
+        
+        <!-- Menú Principal -->
+        <div id="mainMenu">
+            <div class="menu-buttons">
+                <button id="startGameBtn">🎮 Iniciar Juego</button>
+                <button id="recordsBtn">🏆 Records</button>
+                <button id="exitBtn">🚪 Salir del Juego</button>
+            </div>
+        </div>
+
+        <!-- Área de Juego -->
+        <div id="gameArea">
+            <div class="info">
+                <div class="info-item" id="memoryTimeContainer" style="display:none;">
+                    <div class="info-label">Tiempo de Memorización</div>
+                    <div class="info-value" id="memoryTime">10</div>
+                </div>
+                <div class="info-item" id="gameTimeContainer" style="display:none; width: 100%;">
+                    <div class="info-label">Tiempo Restante</div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar">
+                            <span class="progress-time" id="progressTime">60s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="500" height="500"></canvas>
+
+            <div class="controls">
+                <button id="helpBtn">💡 AYUDA (Mantener presionado)</button>
+                <button id="backToMenuBtn">Volver al Menú</button>
+                <button id="restartBtn" style="display:none;">Reintentar</button>
+            </div>
+
+            <div class="warning" id="helpWarning" style="display:none;">
+                ⚠️ ¡El tiempo corre 5x más rápido mientras usas la ayuda!
+            </div>
+
+            <div id="message" class="message" style="display:none;"></div>
+
+            <div class="instructions">
+                <strong>Instrucciones:</strong> Usa las flechas del teclado (↑ ↓ ← →) o WASD para mover al jugador. 
+                Primero memoriza el laberinto, luego desaparecerá y deberás encontrar la salida de memoria. 
+                ¡Llega a la meta verde antes de que se acabe el tiempo!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Elementos del DOM
+        const mainMenu = document.getElementById('mainMenu');
+        const gameArea = document.getElementById('gameArea');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const recordsBtn = document.getElementById('recordsBtn');
+        const exitBtn = document.getElementById('exitBtn');
+        const backToMenuBtn = document.getElementById('backToMenuBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const helpBtn = document.getElementById('helpBtn');
+        const helpWarning = document.getElementById('helpWarning');
+        const messageDiv = document.getElementById('message');
+        const memoryTimeDisplay = document.getElementById('memoryTime');
+        const memoryTimeContainer = document.getElementById('memoryTimeContainer');
+        const gameTimeContainer = document.getElementById('gameTimeContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressTime = document.getElementById('progressTime');
+
+        // Configuración del juego
+        const CELL_SIZE = 50;
+        const COLS = 10;
+        const ROWS = 10;
+        const MEMORY_TIME = 10; // segundos para memorizar
+        const GAME_TIME = 60; // segundos para completar
+
+        // Estados del juego
+        let gameState = 'ready'; // ready, memorizing, playing, won, lost
+        let showMaze = true;
+        let memoryTimer = MEMORY_TIME;
+        let gameTimer = GAME_TIME;
+        let timerInterval;
+        let helpActive = false;
+        let normalTimerSpeed = 1000; // 1 segundo normal
+        let helpTimerSpeed = 200; // 5x más rápido (1000/5 = 200ms)
+
+        // Laberinto (1 = pared, 0 = camino)
+        const maze = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+            [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+            [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+            [1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        ];
+
+        // Posición del jugador
+        let player = { x: 1, y: 1 };
+
+        // Posición de la meta
+        const goal = { x: 8, y: 8 };
+
+        // Dibujar el laberinto
+        function drawMaze() {
+            for (let row = 0; row < ROWS; row++) {
+                for (let col = 0; col < COLS; col++) {
+                    if (showMaze) {
+                        if (maze[row][col] === 1) {
+                            ctx.fillStyle = '#2d3561';
+                            ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                            ctx.strokeStyle = '#1a1a2e';
+                            ctx.strokeRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        } else {
+                            ctx.fillStyle = '#0f3460';
+                            ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                        }
+                    } else {
+                        ctx.fillStyle = '#1a1a2e';
+                        ctx.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+                    }
+                }
+            }
+        }
+
+        // Dibujar la meta
+        function drawGoal() {
+            if (showMaze) {
+                ctx.fillStyle = '#16c79a';
+                ctx.beginPath();
+                ctx.arc(
+                    goal.x * CELL_SIZE + CELL_SIZE / 2,
+                    goal.y * CELL_SIZE + CELL_SIZE / 2,
+                    CELL_SIZE / 3,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+            }
+        }
+
+        // Dibujar el jugador
+        function drawPlayer() {
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(
+                player.x * CELL_SIZE + CELL_SIZE / 2,
+                player.y * CELL_SIZE + CELL_SIZE / 2,
+                CELL_SIZE / 3,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+            
+            // Borde
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Renderizar todo
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawMaze();
+            drawGoal();
+            drawPlayer();
+        }
+
+        // Mover jugador
+        function movePlayer(dx, dy) {
+            if (gameState !== 'playing') return;
+
+            const newX = player.x + dx;
+            const newY = player.y + dy;
+
+            // Verificar límites y colisiones
+            if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
+                if (maze[newY][newX] === 0) {
+                    player.x = newX;
+                    player.y = newY;
+
+                    // Verificar si llegó a la meta
+                    if (player.x === goal.x && player.y === goal.y) {
+                        winGame();
+                    }
+
+                    render();
+                } else {
+                    // Se movió hacia una pared (movimiento incorrecto)
+                    // Penalización: -10 segundos
+                    gameTimer = Math.max(0, gameTimer - 10);
+                    updateProgressBar();
+                    
+                    // Mostrar mensaje de penalización temporal
+                    const tempMsg = document.createElement('div');
+                    tempMsg.textContent = '❌ -10 segundos por movimiento incorrecto!';
+                    tempMsg.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: rgba(231, 76, 60, 0.95);
+                        color: white;
+                        padding: 20px 40px;
+                        border-radius: 10px;
+                        font-size: 1.2em;
+                        font-weight: bold;
+                        z-index: 1000;
+                        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+                    `;
+                    document.body.appendChild(tempMsg);
+                    setTimeout(() => tempMsg.remove(), 1500);
+                    
+                    if (gameTimer <= 0) {
+                        clearInterval(timerInterval);
+                        loseGame();
+                    }
+                }
+            }
+        }
+
+        // Control de teclado
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    e.preventDefault();
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    e.preventDefault();
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    e.preventDefault();
+                    movePlayer(1, 0);
+                    break;
+            }
+        });
+
+        // Mostrar mensaje
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+
+        // Actualizar barra de progreso
+        function updateProgressBar() {
+            const percentage = (gameTimer / GAME_TIME) * 100;
+            progressBar.style.width = percentage + '%';
+            progressTime.textContent = gameTimer + 's';
+            
+            // Cambiar color según tiempo restante
+            if (percentage > 50) {
+                progressBar.style.background = 'linear-gradient(90deg, #16c79a 0%, #11998e 100%)';
+            } else if (percentage > 25) {
+                progressBar.style.background = 'linear-gradient(90deg, #f39c12 0%, #e67e22 100%)';
+            } else {
+                progressBar.style.background = 'linear-gradient(90deg, #e74c3c 0%, #c0392b 100%)';
+            }
+        }
+
+        // Iniciar juego desde menú
+        function startGameFromMenu() {
+            mainMenu.style.display = 'none';
+            gameArea.style.display = 'block';
+            startGame();
+        }
+
+        // Iniciar juego
+        function startGame() {
+            gameState = 'memorizing';
+            showMaze = true;
+            memoryTimer = MEMORY_TIME;
+            gameTimer = GAME_TIME;
+            player = { x: 1, y: 1 };
+            helpActive = false;
+            
+            restartBtn.style.display = 'none';
+            helpBtn.style.display = 'none';
+            helpWarning.style.display = 'none';
+            messageDiv.style.display = 'none';
+            memoryTimeContainer.style.display = 'block';
+            gameTimeContainer.style.display = 'none';
+            
+            render();
+            showMessage(`¡Memoriza el laberinto! ${memoryTimer}s`, 'memorize');
+            
+            // Timer de memorización
+            timerInterval = setInterval(() => {
+                memoryTimer--;
+                memoryTimeDisplay.textContent = memoryTimer;
+                showMessage(`¡Memoriza el laberinto! ${memoryTimer}s`, 'memorize');
+                
+                if (memoryTimer <= 0) {
+                    clearInterval(timerInterval);
+                    startPlayPhase();
+                }
+            }, 1000);
+        }
+
+        // Fase de juego
+        function startPlayPhase() {
+            gameState = 'playing';
+            showMaze = false;
+            memoryTimeContainer.style.display = 'none';
+            gameTimeContainer.style.display = 'block';
+            helpBtn.style.display = 'inline-block';
+            render();
+            updateProgressBar();
+            showMessage('¡Encuentra la salida!', 'play');
+            
+            // Timer de juego
+            startGameTimer();
+        }
+
+        // Iniciar el timer del juego
+        function startGameTimer() {
+            const currentSpeed = helpActive ? helpTimerSpeed : normalTimerSpeed;
+            
+            timerInterval = setInterval(() => {
+                gameTimer--;
+                updateProgressBar();
+                
+                if (gameTimer <= 0) {
+                    clearInterval(timerInterval);
+                    loseGame();
+                }
+            }, currentSpeed);
+        }
+
+        // Reiniciar el timer con nueva velocidad
+        function restartGameTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            startGameTimer();
+        }
+
+        // Activar ayuda
+        function activateHelp() {
+            if (gameState !== 'playing') return;
+            
+            helpActive = true;
+            showMaze = true;
+            helpBtn.classList.add('active');
+            helpWarning.style.display = 'block';
+            render();
+            restartGameTimer();
+        }
+
+        // Desactivar ayuda
+        function deactivateHelp() {
+            if (gameState !== 'playing') return;
+            
+            helpActive = false;
+            showMaze = false;
+            helpBtn.classList.remove('active');
+            helpWarning.style.display = 'none';
+            render();
+            restartGameTimer();
+        }
+
+        // Ganar
+        function winGame() {
+            gameState = 'won';
+            clearInterval(timerInterval);
+            showMaze = true;
+            render();
+            showMessage('🎉 ¡Felicidades! ¡Has completado el laberinto!', 'win');
+            restartBtn.style.display = 'inline-block';
+        }
+
+        // Perder
+        function loseGame() {
+            gameState = 'lost';
+            showMaze = true;
+            render();
+            showMessage('⏰ ¡Se acabó el tiempo! Inténtalo de nuevo', 'lose');
+            restartBtn.style.display = 'inline-block';
+        }
+
+        // Volver al menú
+        function backToMenu() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            gameState = 'ready';
+            showMaze = true;
+            memoryTimer = MEMORY_TIME;
+            gameTimer = GAME_TIME;
+            player = { x: 1, y: 1 };
+            
+            gameArea.style.display = 'none';
+            mainMenu.style.display = 'block';
+            messageDiv.style.display = 'none';
+        }
+
+        // Event listeners
+        startGameBtn.addEventListener('click', startGameFromMenu);
+        backToMenuBtn.addEventListener('click', backToMenu);
+        restartBtn.addEventListener('click', startGame);
+        exitBtn.addEventListener('click', () => {
+            window.close();
+        });
+
+        // Event listeners para el botón de ayuda
+        helpBtn.addEventListener('mousedown', activateHelp);
+        helpBtn.addEventListener('mouseup', deactivateHelp);
+        helpBtn.addEventListener('mouseleave', deactivateHelp);
+        
+        // Para dispositivos táctiles
+        helpBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            activateHelp();
+        });
+        helpBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            deactivateHelp();
+        });
+
+        // Render inicial (aunque no se muestra hasta iniciar)
+        render();
+    </script>
+</body>
+</html>
