@@ -1,100 +1,156 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NeuroRaze</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <div class="container">
-        
-        <img src="img/NEURO RAZE.png" alt="NeuroRaze" class="logo">
-        
-        <div id="mainMenu">
-            <div class="menu-buttons">
-                <button id="startGameBtn">🎮 Iniciar Juego</button>
-                <button id="recordsBtn">🏆 Records</button>
-                <button id="exitBtn">🚪 Salir del Juego</button>
-            </div>
-        </div>
+      <img src="img/NEURO RAZE.png" alt="NeuroRaze" class="logo" />
 
-        <div id="recordsScreen" style="display:none;">
-            <h2>🏆 HALL OF FAME 🏆</h2>
-            <div id="recordsTabs" style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-                <button class="tab-btn active" data-level="0">Nivel 1</button>
-                <button class="tab-btn" data-level="1">Nivel 2</button>
-                <button class="tab-btn" data-level="2">Nivel 3</button>
-            </div>
-            <div id="recordsContent" style="background:#f8f9fa; padding:20px; border-radius:10px; min-height:300px;"></div>
-            <div style="text-align:center; margin-top:20px;">
-                <button id="clearRecordsBtn" style="background:#e74c3c;">🗑️ Limpiar Records</button>
-                <button id="backFromRecordsBtn">Volver al Menú</button>
-            </div>
+      <div id="mainMenu">
+        <div class="menu-buttons">
+          <button id="startGameBtn">🎮 Iniciar Juego</button>
+          <button id="recordsBtn">🏆 Records</button>
+          <button id="exitBtn">🚪 Salir del Juego</button>
         </div>
+      </div>
 
-        <div id="nameInputScreen" style="display:none;">
-            <h2 style="color:#16c79a;">🎉 ¡NUEVO RECORD! 🎉</h2>
-            <div style="text-align:center; font-size:1.3em; margin-bottom:30px; color:#333;">
-                <div>Tiempo: <strong id="recordTime" style="color:#667eea;">0s</strong></div>
-                <div style="margin-top:10px;">Nivel: <strong id="recordLevel" style="color:#764ba2;">-</strong></div>
-            </div>
-            <div style="text-align:center;">
-                <div style="font-size:1.2em; margin-bottom:15px; color:#555;">Ingresa tu nombre:</div>
-                <input type="text" id="playerNameInput" maxlength="10" 
-                       style="font-size:2em; text-align:center; padding:15px; width:300px; max-width:90%; 
-                              border:3px solid #667eea; border-radius:10px; text-transform:uppercase; 
-                              letter-spacing:5px; font-weight:bold; background:#fff3cd;"
-                       placeholder="PLAYER">
-                <div style="margin-top:20px;">
-                    <button id="saveRecordBtn" style="font-size:1.2em; padding:15px 40px;">💾 GUARDAR</button>
+      <div id="recordsScreen" style="display: none">
+        <h2>🏆 HALL OF FAME 🏆</h2>
+        <div
+          id="recordsTabs"
+          style="
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+          "
+        >
+          <button class="tab-btn active" data-level="0">Nivel 1</button>
+          <button class="tab-btn" data-level="1">Nivel 2</button>
+          <button class="tab-btn" data-level="2">Nivel 3</button>
+        </div>
+        <div
+          id="recordsContent"
+          style="
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 300px;
+          "
+        ></div>
+        <div style="text-align: center; margin-top: 20px">
+          <button id="clearRecordsBtn" style="background: #e74c3c">
+            🗑️ Limpiar Records
+          </button>
+          <button id="backFromRecordsBtn">Volver al Menú</button>
+        </div>
+      </div>
+
+      <div id="nameInputScreen" style="display: none">
+        <h2 style="color: #16c79a">🎉 ¡NUEVO RECORD! 🎉</h2>
+        <div
+          style="
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #333;
+          "
+        >
+          <div>
+            Tiempo: <strong id="recordTime" style="color: #667eea">0s</strong>
+          </div>
+          <div style="margin-top: 10px">
+            Nivel: <strong id="recordLevel" style="color: #764ba2">-</strong>
+          </div>
+        </div>
+        <div style="text-align: center">
+          <div style="font-size: 1.2em; margin-bottom: 15px; color: #555">
+            Ingresa tu nombre:
+          </div>
+          <input
+            type="text"
+            id="playerNameInput"
+            maxlength="10"
+            style="
+              font-size: 2em;
+              text-align: center;
+              padding: 15px;
+              width: 300px;
+              max-width: 90%;
+              border: 3px solid #667eea;
+              border-radius: 10px;
+              text-transform: uppercase;
+              letter-spacing: 5px;
+              font-weight: bold;
+              background: #fff3cd;
+            "
+            placeholder="PLAYER"
+          />
+          <div style="margin-top: 20px">
+            <button
+              id="saveRecordBtn"
+              style="font-size: 1.2em; padding: 15px 40px"
+            >
+              💾 GUARDAR
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="gameArea">
+        <div class="info">
+          <div class="info-item" id="memoryTimeContainer" style="display: none">
+            <div class="info-label">Tiempo de Memorización</div>
+            <div class="info-value" id="memoryTime">10</div>
+          </div>
+          <div
+            class="info-item"
+            id="gameTimeContainer"
+            style="display: none; width: 100%"
+          >
+            <div class="info-label">Tiempo Restante</div>
+            <div class="top-controls">
+              <div class="progress-container">
+                <div class="progress-bar" id="progressBar">
+                  <span class="progress-time" id="progressTime">30s</span>
                 </div>
+              </div>
+              <button id="helpBtn" class="help-top" title="Ayuda">Ver</button>
             </div>
+          </div>
         </div>
 
-        <div id="gameArea">
-            <div class="info">
-                <div class="info-item" id="memoryTimeContainer" style="display:none;">
-                    <div class="info-label">Tiempo de Memorización</div>
-                    <div class="info-value" id="memoryTime">10</div>
-                </div>
-                    <div class="info-item" id="gameTimeContainer" style="display:none; width: 100%;">
-                        <div class="info-label">Tiempo Restante</div>
-                        <div class="top-controls">
-                            <div class="progress-container">
-                                <div class="progress-bar" id="progressBar">
-                                    <span class="progress-time" id="progressTime">30s</span>
-                                </div>
-                            </div>
-                            <button id="helpBtn" class="help-top" title="Ayuda">Ver</button>
-                        </div>
-                    </div>
-            </div>
+        <canvas id="gameCanvas" width="500" height="500"></canvas>
 
-            <canvas id="gameCanvas" width="500" height="500"></canvas>
-
-            <div class="controls">
-                <button id="backToMenuBtn">Volver al Menú</button>
-                <button id="restartBtn" style="display:none;">Reintentar</button>
-            </div>
-
-            <div class="warning" id="helpWarning" style="display:none;">
-                ⚠️ ¡El tiempo corre 5x más rápido mientras usas la ayuda!
-            </div>
-
-            <div id="message" class="message" style="display:none;"></div>
-
-            <div class="instructions">
-                <strong>Instrucciones:</strong> Usa las flechas del teclado (↑ ↓ ← →) o WASD para mover al jugador. 
-                Primero memoriza el laberinto, luego desaparecerá y deberás encontrar la salida de memoria. 
-                ¡Llega a la meta verde antes de que se acabe el tiempo!
-            </div>
+        <div class="controls">
+          <button id="backToMenuBtn">Volver al Menú</button>
+          <button id="restartBtn" style="display: none">Reintentar</button>
         </div>
+
+        <div class="warning" id="helpWarning" style="display: none">
+          ⚠️ ¡El tiempo corre 5x más rápido mientras usas la ayuda!
+        </div>
+
+        <div id="message" class="message" style="display: none"></div>
+
+        <div class="instructions">
+          <strong>Instrucciones:</strong> Usa las flechas del teclado (↑ ↓ ← →)
+          o WASD para mover al jugador. Primero memoriza el laberinto, luego
+          desaparecerá y deberás encontrar la salida de memoria. ¡Llega a la
+          meta verde antes de que se acabe el tiempo!
+        </div>
+      </div>
     </div>
 
     <!-- overlay para efecto de daño -->
-    <div id="damageOverlay" class="damage-overlay"><div class="pulse" style="width:100%;height:100%"></div></div>
-    
+    <div id="damageOverlay" class="damage-overlay">
+      <div class="pulse" style="width: 100%; height: 100%"></div>
+    </div>
+
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
